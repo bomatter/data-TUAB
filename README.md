@@ -14,14 +14,20 @@ This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.p
 
 ## Reproduce from the Source Data
 
-1. [Request access](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) and download TUAB to `sourcedata/`
+1. Clone repository
+
+   ```
+   git clone https://github.com/bomatter/data-TUAB.git TUAB
+   ```
+
+2. [Request access](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) and download TUAB to `sourcedata/`
 
    ```
    mkdir sourcedata
    rsync -auxvL nedc-eeg@www.isip.piconepress.com:data/eeg/tuh_eeg_abnormal/v3.0.1/ sourcedata/v3.0.1
    ```
 
-2. Install dependencies or use an existing environment with mne and mne-bids installed.
+3. Install dependencies or use an existing environment with mne and mne-bids installed.
    Example using mamba:
 
    ```
@@ -29,9 +35,15 @@ This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.p
    mamba activate bidsify
    ```
 
-3. Run the BIDS conversion script.
+4. Run the BIDS conversion script.
 
    ```
    python code/convert_TUAB_to_BIDS.py
    ```
 
+5. (optional) Modify or delete the `.gitignore` file to start tracking the data folders with DataLad.
+   
+   ```
+   rm .gitignore
+   datalad save -m"start tracking data folders"
+   ```
