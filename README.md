@@ -41,9 +41,10 @@ This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.p
    python code/convert_TUAB_to_BIDS.py
    ```
 
-5. (optional) Modify or delete the `.gitignore` file to start tracking the data folders with DataLad.
+5. (optional) Modify or delete the `.gitignore` file to start tracking the data folders with [DataLad](https://www.datalad.org/).
    
    ```
+   mamba install datalad
    rm .gitignore
    datalad save -m"start tracking data folders"
    ```
