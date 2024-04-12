@@ -125,6 +125,10 @@ if rawdata_dir.exists():
     print(f"Deleting existing rawdata directory: {rawdata_dir}")
     shutil.rmtree(rawdata_dir)
 
+
+## Convert TUAB to BIDS
+#
+
 files = list(sourcedata_dir.glob("**/*.edf"))
 errors = []
 
@@ -176,7 +180,7 @@ for file in tqdm(files):
         participants_tsv = pd.read_csv(rawdata_dir / "participants.tsv", sep="\t")
         participants_tsv.loc[participants_tsv.participant_id == f"sub-{subject}", "age"] = age
         participants_tsv.loc[participants_tsv.participant_id == f"sub-{subject}", "sex"] = sex
-        participants_tsv.loc[participants_tsv.participant_id == f"sub-{subject}", "split"] = split
+        participants_tsv.loc[participants_tsv.participant_id == f"sub-{subject}", "official_split"] = split
         participants_tsv.to_csv(rawdata_dir / "participants.tsv", sep="\t", index=False, na_rep="n/a")
 
         # Add recording information
@@ -190,9 +194,62 @@ for file in tqdm(files):
         print(f"Error processing file {file}: {e}")
         errors.append(file)
         continue
-    
+
+
+## Curate participants.tsv
+#
+
+participants_tsv = pd.read_csv(rawdata_dir / "participants.tsv", sep="\t")
+
+# Replace missing / unrealistic age values with NaN
+# The original participants.tsv file contains some age values of 999 years.
+participants_tsv.loc[participants_tsv["age"] > 120, "age"] = None
+
+# Add n_normal_recordings and n_abnormal_recordings columns
+# The labels are stored in the scans.tsv files. For some subjects, we have multiple scans.
+# We will count the number of normal and abnormal scans for each subject.
+participants_tsv["normal"] = 0
+participants_tsv["abnormal"] = 0
+
+# Collect lables from scants.tsv files in BIDS dataset
+for sub in participants_tsv.participant_id:
+    scans_tsv_files = (rawdata_dir / sub).rglob("*_scans.tsv")
+    for scans_tsv_file in scans_tsv_files:
+        scans_tsv = pd.read_csv(scans_tsv_file, sep="\t")
+        normality = scans_tsv["normality"].item()
+        participants_tsv.loc[participants_tsv.participant_id == sub, normality] += 1
+
+participants_tsv = participants_tsv.rename(columns={"normal": "n_normal_recordings", "abnormal": "n_abnormal_recordings"})
+
+
+## Add custom train/val/test split
+#
+
+# Split according to official split
+participants_test = participants_tsv.loc[participants_tsv.official_split == "eval"]
+participants_train = participants_tsv.loc[participants_tsv.official_split == "train"]
+assert set(participants_test.participant_id).isdisjoint(set(participants_train.participant_id))
+
+# Split train into train and validation
+train_size = 0.9  # Use 10% of the official train split for validation
+participants_val = participants_train.sample(frac=1-train_size, random_state=42)
+participants_train = participants_train.drop(participants_val.index)
+assert set(participants_val.participant_id).isdisjoint(set(participants_train.participant_id))
+
+# Add new split column to participants_tsv
+participants_tsv["train_val_test_split"] = "none"
+participants_tsv.loc[participants_tsv.participant_id.isin(participants_train.participant_id), "train_val_test_split"] = "train"
+participants_tsv.loc[participants_tsv.participant_id.isin(participants_val.participant_id), "train_val_test_split"] = "val"
+participants_tsv.loc[participants_tsv.participant_id.isin(participants_test.participant_id), "train_val_test_split"] = "test"
+
+# Save curated participants.tsv
+participants_tsv.to_csv(rawdata_dir / "participants.tsv", sep="\t", index=False, na_rep="n/a")
+
+
+## Print summary
+#
+
 print(f"BIDS conversion completed. {len(files)- len(errors)}/{len(files)} files were successfully processed.")
 if errors:
     print("Errors occurred for the following files:")
     print("\n".join(errors))
-
