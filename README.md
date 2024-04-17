@@ -18,6 +18,7 @@ This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.p
 
    ```
    git clone https://github.com/bomatter/data-TUAB.git TUAB
+   cd TUAB
    ```
 
 2. Install dependencies or use an existing environment with mne and mne-bids installed.
