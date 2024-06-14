@@ -1,6 +1,6 @@
 # TUAB Dataset
 
-This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) v3.0.1.
+This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) v3.0.1 in BIDS format.
 
 
 
