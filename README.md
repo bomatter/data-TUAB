@@ -1,6 +1,6 @@
 # TUAB Dataset
 
-This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) v3.0.1 in BIDS format.
+This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.piconepress.com/projects/nedc/html/tuh_eeg/#c_tuab) v3.0.1 in BIDS format.
 
 
 
@@ -37,11 +37,11 @@ This is a curated version of the [TUH Abnormal EEG Corpus (TUAB)](https://isip.p
    datalad save -m"start tracking data folders"
    ```
    
-4. [Request access](https://isip.piconepress.com/projects/tuh_eeg/html/downloads.shtml) and download TUAB to `sourcedata/`
+4. [Request access](https://isip.piconepress.com/projects/nedc/html/tuh_eeg/) and download TUAB to `sourcedata/`
 
    ```
    mkdir sourcedata
-   rsync -auxvL nedc-eeg@www.isip.piconepress.com:data/eeg/tuh_eeg_abnormal/v3.0.1/ sourcedata/v3.0.1
+   rsync -auxvL nedc-tuh-eeg@www.isip.piconepress.com:data/tuh_eeg/tuh_eeg_abnormal/v3.0.1/ sourcedata/v3.0.1
    ```
 
    Save if you are using DataLad to track the data folders:
